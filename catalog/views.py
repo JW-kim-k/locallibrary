@@ -91,7 +91,7 @@ def renew_book_librarian(request, pk):
             book_instance.save()
 
             # redirect to a new URL:
-            return HttpResponseRedirect(reverse('all-borrowed'))
+            return HttpResponseRedirect(reverse('catalog:allBorrowed'))
 
     # If this is a GET (or any other method) create the default form.
     else:
@@ -108,17 +108,38 @@ def renew_book_librarian(request, pk):
 
 
 @login_required
-@permission_required('user.is_npm', raise_exception=True)
+@permission_required('catalog.can_view_all_borrowed_books', raise_exception=True)
 def allBorrowed(req):
      # Generate counts of some of the main objects
     num_books = Book.objects.all().count()
     num_instances = BookInstance.objects.all().count()
 
-    # Available books (status = 'a')
+    # Loan books (status = 'o')
     instances_onloan = BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
     context = {
         'bookinstance_list' : instances_onloan,
     }
-
+    
     return render(req, 'catalog/all_borrowed.html', context)
+
+
+
+
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+
+from catalog.models import Author
+
+class AuthorCreate(CreateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    initial = {'date_of_death': '11/06/2020'}
+
+class AuthorUpdate(UpdateView):
+    model = Author
+    fields = '__all__' # Not recommended (potential security issue if more fields added)
+
+class AuthorDelete(DeleteView):
+    model = Author
+    success_url = reverse_lazy('authors')
