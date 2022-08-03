@@ -1,4 +1,5 @@
 {% extends "base_generic.html" %}
+{% load socialaccount %}
 
 {% block content %}
 
@@ -15,25 +16,21 @@
   {% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-
-<div>
-  <td>{{ form.username.label_tag }}</td>
-  <td>{{ form.username }}</td>
-</div>
-<div>
-  <td>{{ form.password.label_tag }}</td>
-  <td>{{ form.password }}</td>
-</div>
-
-<div>
-  <input type="submit" value="login" />
-  <input type="hidden" name="next" value="{{ next }}" />
-</div>
+<h1>Login</h1>
+<form method="POST" action="{% url 'login'%}">
+    {% csrf_token %}
+    <p>{{ error }}</p>
+    아이디:
+    <br>
+    <input name="username" type="text" value="" required>
+    <br>
+    비밀번호:
+    <br>
+    <input name="password" type="password" value="" required>
+    <br>
+    <br>
+    <input class="btn btn-dark" type="submit" value="로그인">
 </form>
-
-{# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+<a href="{% provider_login_url 'google' %}" class="btn btn-google btn-user btn-block"><i class ="fab fa-google fa-fw"></i>Google Login</a><br>
 
 {% endblock %}
